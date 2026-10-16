@@ -1,0 +1,27 @@
+# Rust / Tauri build output
+target/
+src-tauri/target/
+src-tauri/gen/
+src-tauri/WixTools/
+src-tauri/Cargo.toml
+src-tauri/Cargo.lock
+Cargo.lock
+
+# Python
+.venv/
+env/
+__pycache__/
+*.pyc
+
+# Secrets
+.env
+*.key
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Generated icon source
+app-icon.png

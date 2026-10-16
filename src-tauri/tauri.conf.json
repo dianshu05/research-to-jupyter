@@ -1,0 +1,24 @@
+{
+  "$schema": "https://raw.githubusercontent.com/tauri-apps/tauri/dev/tooling/cli/schema.json",
+  "productName": "Research to Jupyter",
+  "version": "2.1.0",
+  "identifier": "com.research2jupyter.app",
+  "build": { "frontendDist": "../dist" },
+  "app": {
+    "withGlobalTauri": true,
+    "windows": [
+      {
+        "title": "Research to Jupyter — Exact Experiment Synthesizer",
+        "width": 1280, "height": 840, "minWidth": 1024, "minHeight": 680,
+        "center": true, "resizable": true, "dragDropEnabled": true
+      }
+    ],
+    "security": { "capabilities": ["default"] }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "resources": { "../scripts/extract_paper.py": "scripts/extract_paper.py" },
+    "icon": ["icons/32x32.png", "icons/128x128.png", "icons/128x128@2x.png", "icons/icon.icns", "icons/icon.ico"]
+  }
+}
