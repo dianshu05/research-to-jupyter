@@ -1,7 +1,10 @@
 name: release
+
 on:
   push:
-    tags: ["v*"]
+    tags:
+      - "v*"
+
 jobs:
   build:
     strategy:
@@ -9,17 +12,48 @@ jobs:
       matrix:
         os: [windows-latest, macos-latest, ubuntu-22.04]
     runs-on: ${{ matrix.os }}
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with: { node-version: 20 }
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: tauri-apps/tauri-action@v0
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Setup Rust
+        uses: dtolnay/rust-toolchain@stable
+
+      - name: Install Linux system deps
+        if: matrix.os == 'ubuntu-22.04'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            libwebkit2gtk-4.1-dev \
+            build-essential curl wget file \
+            libxdo-dev libssl-dev \
+            libayatana-appindicator3-dev librsvg2-dev
+
+      - name: Setup Python (for icon generation)
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Generate icons
+        run: |
+          python -c "from PIL import Image; Image.new('RGBA',(1024,1024),(16,185,129,255)).save('app-icon.png')"
+          cargo tauri icon app-icon.png
+
+      - name: Build & release
+        uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Research to Jupyter ${{ github.ref_name }}"
-          releaseBody: "Cross-platform build."
+          releaseBody: |
+            Cross-platform build of Research to Jupyter.
+            See the README for install instructions.
           releaseDraft: false
           prerelease: false
