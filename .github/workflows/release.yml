@@ -5,16 +5,23 @@ on:
     tags:
       - "v*"
 
+permissions:
+  contents: write
+
 jobs:
-  build:
+  release:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-latest, macos-latest, ubuntu-22.04]
+        include:
+          - os: windows-latest
+          - os: macos-latest
+          - os: ubuntu-22.04
+
     runs-on: ${{ matrix.os }}
 
     steps:
-      - name: Checkout
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Setup Node.js
@@ -25,7 +32,7 @@ jobs:
       - name: Setup Rust
         uses: dtolnay/rust-toolchain@stable
 
-      - name: Install Linux system deps
+      - name: Install Linux system dependencies
         if: matrix.os == 'ubuntu-22.04'
         run: |
           sudo apt-get update
@@ -35,25 +42,25 @@ jobs:
             libxdo-dev libssl-dev \
             libayatana-appindicator3-dev librsvg2-dev
 
-      - name: Setup Python (for icon generation)
+      - name: Setup Python
         uses: actions/setup-python@v5
         with:
           python-version: "3.11"
 
-      - name: Generate icons
+      - name: Install Pillow & Generate App Icons
         run: |
+          python -m pip install pillow
           python -c "from PIL import Image; Image.new('RGBA',(1024,1024),(16,185,129,255)).save('app-icon.png')"
+          cargo install tauri-cli --version "^2.0.0" --locked
           cargo tauri icon app-icon.png
 
-      - name: Build & release
+      - name: Build and Publish Release Assets
         uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: "Research to Jupyter ${{ github.ref_name }}"
-          releaseBody: |
-            Cross-platform build of Research to Jupyter.
-            See the README for install instructions.
+          releaseBody: "Automated cross-platform build (Windows, macOS, Linux)."
           releaseDraft: false
           prerelease: false
