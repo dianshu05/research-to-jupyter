@@ -13,17 +13,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - os: windows-latest
-            artifact_path: src-tauri/target/release/bundle/nsis/*.exe
-          - os: windows-latest
-            artifact_path: src-tauri/target/release/bundle/msi/*.msi
-          - os: macos-latest
-            artifact_path: src-tauri/target/release/bundle/dmg/*.dmg
-          - os: ubuntu-22.04
-            artifact_path: src-tauri/target/release/bundle/appimage/*.AppImage
-          - os: ubuntu-22.04
-            artifact_path: src-tauri/target/release/bundle/deb/*.deb
+        os: [windows-latest, macos-latest, ubuntu-22.04]
 
     runs-on: ${{ matrix.os }}
 
@@ -91,9 +81,7 @@ jobs:
         with:
           name: "Research to Jupyter ${{ github.ref_name }}"
           body: |
-            Cross-platform build of Research to Jupyter.
-
-            See the README for installation instructions.
+            Cross-platform build of Research to Jupyter for Windows, macOS, and Linux.
           draft: false
           prerelease: false
           files: all-artifacts/*
